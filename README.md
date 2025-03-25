@@ -31,3 +31,55 @@ void loop() {
 
     delay(1000);
 }
+```
+
+## 📟 แสดงผลบน LCD (I2C)
+
+### การเชื่อมต่อ ESP8266 กับ LCD (I2C)
+| LCD | ESP8266 |
+|------|--------|
+| GND  | GND    |
+| VCC  | 3.3V   |
+| SDA  | D2 (GPIO4) |
+| SCL  | D1 (GPIO5) |
+
+### ตัวอย่างโค้ด
+```cpp
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <BatteryMonitor.h>
+
+#define BATTERY_PIN A0  // ขาอ่านแรงดันแบตเตอรี่
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // กำหนดที่อยู่ I2C ของ LCD
+BatteryMonitor battery(BATTERY_PIN);
+
+void setup() {
+    lcd.begin();
+    lcd.backlight();
+}
+
+void loop() {
+    float voltage = battery.getVoltage();
+    int percentage = battery.getPercentage();
+    
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Battery: ");
+    lcd.print(voltage);
+    lcd.print("V");
+    
+    lcd.setCursor(0, 1);
+    lcd.print("Charge: ");
+    lcd.print(percentage);
+    lcd.print("%");
+    
+    delay(2000);  // อัปเดตค่าทุก ๆ 2 วินาที
+}
+```
+
+## หมายเหตุ
+- ค่าแรงดันจะต้องถูกคำนวณตามตัวแบ่งแรงดันที่ใช้ เช่น หากใช้ตัวแบ่งแรงดัน 100K และ 220K ควรใช้สูตรแปลงให้ถูกต้องใน `BatteryMonitor.h`
+
+## License
+MIT License
